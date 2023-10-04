@@ -16,16 +16,16 @@ SimpleCoin is a rudimentary implementation of a blockchain-based cryptocurrency 
 2. Clone this repository:
    ```bash
    git clone [Your Repository URL]
-   '''
+   ```
 
 3. Navigate to the project directory
-   '''bash
+   ```bash
    cd SimpleCoin
-   '''
+   ```
 4. Run the 'simplecoin.py' script to interact with the cryptocurrency:
-   '''bash
+   ```bash
    python simplecoin.py
-   '''
+   ```
 
 ## Usage
 Refer to the 'simplecoin.py' file for detailed code examples on creating transactions, mining blocks, and validating the blockchain.
