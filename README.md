@@ -1,7 +1,5 @@
 # SimpleCoin: A Basic Cryptocurrency
 
-![SimpleCoin Logo](path_to_your_logo.png)  <!-- Optional: Replace 'path_to_your_logo.png' with the path to a logo if you have one -->
-
 ## Introduction
 SimpleCoin is a rudimentary implementation of a blockchain-based cryptocurrency developed in Python. While it's not intended for real-world use, it serves as an educational tool to understand the foundational concepts behind cryptocurrencies and blockchains.
 
