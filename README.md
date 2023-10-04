@@ -1,0 +1,2 @@
+# SimpleCoin
+Simple Cryptocurrency Project
