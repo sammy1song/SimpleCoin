@@ -1,5 +1,8 @@
 import unittest
-from simplecoin import Blockchain, Wallet, Transaction
+from blockchain import Blockchain
+from wallet import Wallet
+from transaction import Transaction
+from constants import *
 
 class TestSimpleCoin(unittest.TestCase):
 
