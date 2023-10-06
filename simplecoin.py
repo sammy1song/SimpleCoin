@@ -57,6 +57,7 @@ class Blockchain:
         self.chain = [self.create_genesis_block()]
         self.transaction_pool = []
         self.stakers = {} # New dictionary to keep track of staked coins
+        self.channels = [] # List to store active channels
 
     def stake_coins(self, address, amount):
         # Check if the user has enough balance
@@ -82,6 +83,17 @@ class Blockchain:
             if r <= stake:
                 return address
             r -= stake
+
+    def challenge_close(self, party1, party2, transaction_index):
+        channel = self.find_channel(party1, party2)
+        if not channel or channel.open:
+            print("Channel not found or still open!")
+            return
+        # Check if the provided transaction index is more recent
+        if transaction_index > len(channel.commitment_transactions) - 1:
+            print("Invalid transaction index!")
+            return
+        channel.close(transaction_index)
 
 
     def add_transaction_to_pool(self, transaction, sender_public_key, signature):
@@ -158,3 +170,63 @@ class Blockchain:
             if current.previous_hash != previous.hash:
                 return False
         return True
+    
+    def open_channel(self, party1, party2, deposit1, deposit2):
+        # Check if both parties have enough balance
+        if self.get_balance(party1) < deposit1 or self.get_balance(party2) < deposit2:
+            print("Insufficient funds to open channel!")
+            return
+        new_channel = Channel(party1, party2, deposit1, deposit2)
+        self.channels.append(new_channel)
+
+    def find_channel(self, party1, party2):
+        for channel in self.channels:
+            if (channel.party1 == party1 and channel.party2 == party2) or (channel.party1 == party2 and channel.party2 == party1):
+                return channel
+        return None
+
+    def update_channel(self, party1, party2, amount, signature1, signature2):
+        channel = self.find_channel(party1, party2)
+        if not channel:
+            print("Channel not found!")
+            return
+        channel.update(amount, signature1, signature2)
+
+    def close_channel(self, party1, party2):
+        channel = self.find_channel(party1, party2)
+        if not channel:
+            print("Channel not found!")
+            return
+        channel.close()
+        # Logic to settle the final balances on the main chain can be added here
+
+class Channel:
+    def __init__(self, party1, party2, deposit1, deposit2):
+        self.party1 = party1
+        self.party2 = party2
+        self.balance1 = deposit1
+        self.balance2 = deposit2
+        self.open = True
+        self.commitment_transactions = []
+
+    def update(self, amount, signature1, signature2):
+        if not self.open:
+            print("Channel is closed!")
+            return
+        # Verify signatures
+        if not Wallet.verify_signature(self.party1, signature1, str(amount)) or not Wallet.verify_signature(self.party2, signature2, str(amount)):
+            print("Invalid signatures!")
+            return
+        self.balance1 -= amount
+        self.balance2 += amount
+        # Store the commitment transaction
+        self.commitment_transactions.append((amount, signature1, signature2))
+
+    def close(self, transaction_index=None):
+        self.open = False
+        # If a specific transaction index is provided, close with that state
+        if transaction_index and transaction_index < len(self.commitment_transactions):
+            amount, _, _ = self.commitment_transactions[transaction_index]
+            self.balance1 -= amount
+            self.balance2 += amount
+        # Logic to settle the final balances on the main chain can be added here
